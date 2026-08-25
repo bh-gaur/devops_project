@@ -13,14 +13,16 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = pathexpand("~/.kube/config")
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    config_path = pathexpand("~/.kube/config")
   }
 }
+
+
 
 resource "kubernetes_namespace" "monitoring" {
   metadata {
@@ -83,7 +85,12 @@ resource "helm_release" "falco" {
     value = "true"
   }
   set {
+    name  = "driver.enabled"
+    value = "false"
+  }
+  set {
     name  = "falcosidekick.enabled"
     value = "true"
   }
+
 }

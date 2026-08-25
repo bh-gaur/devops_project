@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: devops-app-rollout
+  namespace: default
+  labels:
+    app: devops-app
+spec:
+  replicas: 5
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: devops-app
+  strategy:
+    canary:
+      stableService: devops-app-service
+      canaryService: devops-app-canary-service
+      analysis:
+        templates:
+          - templateName: success-rate-analysis
+        args:
+          - name: service-name
+            value: devops-app-canary-service
+      steps:
+        - setWeight: 10
+        - pause: { duration: 10m }
+        - setWeight: 50
+        - pause: { duration: 5m }
+  template:
+    metadata:
+      labels:
+        app: devops-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      containers:
+        - name: devops-app
+          image: devops-app:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8000
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5

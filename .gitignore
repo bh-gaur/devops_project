@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+app/.venv/
+operator/.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.rc
+terraform.rc
+
+# Kubernetes / Local KinD / Helm
+kubeconfig
+*.kubeconfig
+helm/*.tgz
+
+# Security & Secrets
+*.pem
+*.key
+*.crt
+*.pub
+.env
+.env.local
+
+# Logs & Security Scan Reports
+*.log
+trivy-results.sarif
+.ansible/
+*.retry
+
+# Operating System & IDE
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

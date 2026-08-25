@@ -1,0 +1,31 @@
+---
+- name: "Auto-Remediation: Clean Disk Logs & Free Space"
+  hosts: localhost
+  connection: local
+  vars:
+    log_directory: "/var/log/containers"
+    max_age_days: 2
+  tasks:
+    - name: "Log Disk Remediation Action"
+      ansible.builtin.debug:
+        msg: "Executing automated log cleanup on directory {{ log_directory }} to alleviate DiskPressure."
+
+    - name: "Truncate Large Container Log Files"
+      ansible.builtin.shell:
+        cmd: "find {{ log_directory }} -type f -name '*.log' -size +50M -exec truncate -s 0 {} \\;"
+      failed_when: false
+
+    - name: "Remove Old Log Files"
+      ansible.builtin.shell:
+        cmd: "find {{ log_directory }} -type f -name '*.log.*' -mtime +{{ max_age_days }} -delete"
+      failed_when: false
+
+    - name: "Report Disk Space After Cleanup"
+      ansible.builtin.command:
+        cmd: "df -h /var/log"
+      register: df_output
+      failed_when: false
+
+    - name: "Display Disk Status"
+      ansible.builtin.debug:
+        var: df_output.stdout_lines

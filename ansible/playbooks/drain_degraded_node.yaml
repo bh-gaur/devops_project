@@ -1,0 +1,26 @@
+---
+- name: "Auto-Remediation: Cordon & Drain Degraded Node"
+  hosts: localhost
+  connection: local
+  vars:
+    target_node: "{{ node_name | default('kind-worker') }}"
+  tasks:
+    - name: "Log Node Drain Remediation Event"
+      ansible.builtin.debug:
+        msg: "Initiating automated cordon and drain sequence for degraded node {{ target_node }}."
+
+    - name: "Cordon Kubernetes Node"
+      ansible.builtin.command:
+        cmd: "kubectl cordon {{ target_node }}"
+      register: cordon_result
+      failed_when: false
+
+    - name: "Drain Kubernetes Node safely"
+      ansible.builtin.command:
+        cmd: "kubectl drain {{ target_node }} --ignore-daemonsets --delete-emptydir-data --force --grace-period=30"
+      register: drain_result
+      failed_when: false
+
+    - name: "Display Node Drain Outcome"
+      ansible.builtin.debug:
+        msg: "Node {{ target_node }} cordon status: {{ cordon_result.rc }}, drain status: {{ drain_result.rc }}"

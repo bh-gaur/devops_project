@@ -1,0 +1,28 @@
+---
+- name: "Auto-Remediation: Restart Stuck Service Pod"
+  hosts: localhost
+  connection: local
+  vars:
+    target_namespace: "{{ app_namespace | default('default') }}"
+    target_deployment: "{{ deployment | default('devops-app-rollout') }}"
+    target_pod: "{{ pod_name | default('') }}"
+  tasks:
+    - name: "Log Remediation Event"
+      ansible.builtin.debug:
+        msg: "Triggering automated rollout restart for deployment {{ target_deployment }} in namespace {{ target_namespace }} due to pod failure {{ target_pod }}."
+
+    - name: "Delete Failing Pod if specified"
+      ansible.builtin.command:
+        cmd: "kubectl delete pod {{ target_pod }} -n {{ target_namespace }} --grace-period=0 --force"
+      when: target_pod != ""
+      failed_when: false
+
+    - name: "Rollout Restart Deployment"
+      ansible.builtin.command:
+        cmd: "kubectl rollout restart rollout/{{ target_deployment }} -n {{ target_namespace }}"
+      register: restart_result
+      failed_when: false
+
+    - name: "Verify Rollout Restart Status"
+      ansible.builtin.debug:
+        msg: "Rollout restart executed with status code {{ restart_result.rc }}."

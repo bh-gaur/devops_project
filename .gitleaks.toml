@@ -1,0 +1,15 @@
+title = "Gitleaks Configuration for DevOps Platform"
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+    '''\.venv/''',
+    '''app/\.venv/''',
+    '''\.git/''',
+    '''tests/''',
+    '''go\.sum$''',
+]
+regexes = [
+    '''example-key''',
+    '''dummy-secret''',
+]

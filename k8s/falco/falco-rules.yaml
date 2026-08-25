@@ -1,0 +1,23 @@
+- rule: Terminal Shell Spawned in Container
+  desc: Detect interactive shell spawn (/bin/sh, /bin/bash, /bin/zsh) inside a running container.
+  condition: >
+    container.id != "" and
+    evt.type = execve and
+    evt.dir = < and
+    (proc.name in (bash, sh, zsh, ksh) or proc.filename in (/bin/sh, /bin/bash, /bin/zsh))
+  output: >
+    Unauthorized interactive shell spawned in container (user=%user.name container_id=%container.id
+    container_name=%container.name image=%container.image.repository command=%proc.cmdline)
+  priority: WARNING
+  tags: [container, shell, security, mitre_execution]
+
+- rule: Sensitive Directory or File Modification
+  desc: Detect attempts to edit sensitive system files like /etc/passwd or /etc/shadow inside a container.
+  condition: >
+    container.id != "" and
+    open_write and
+    fd.name in (/etc/passwd, /etc/shadow, /etc/sudoers)
+  output: >
+    Sensitive system file opened for write access (user=%user.name container=%container.name file=%fd.name)
+  priority: CRITICAL
+  tags: [container, filesystem, privilege_escalation]

@@ -1,0 +1,8 @@
+# Bandit SAST Configuration File
+# https://bandit.readthedocs.io/
+skips: ['B101']
+
+exclude_dirs:
+  - '.venv'
+  - 'app/.venv'
+  - 'app/tests'

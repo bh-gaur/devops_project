@@ -1,0 +1,4 @@
+kubernetes>=29.0.0
+requests>=2.31.0
+ansible-runner>=2.3.6
+pytest>=8.0.0

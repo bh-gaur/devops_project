@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY app/requirements.txt .
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Stage 2: Runtime image (Hardened non-root image)
@@ -24,7 +24,7 @@ RUN groupadd -g 10001 appgroup && \
 COPY --from=builder /install /usr/local
 
 # Copy application source code
-COPY app/ /workspace/app/
+COPY . /workspace/app/
 
 # Set security file permissions
 RUN chown -R appuser:appgroup /workspace
